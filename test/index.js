@@ -52,6 +52,8 @@ test('inheritance', t => {
     t.ok(word === '*quack*');
     t.done();
   });
+
+  qe.talk();
 })
 
 test('derivation', t => {
