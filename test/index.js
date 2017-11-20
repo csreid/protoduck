@@ -1,6 +1,7 @@
 'use strict'
 
 const test = require('tap').test
+const EventEmitter = require('events');
 
 const duck = require('../')
 
@@ -23,6 +24,34 @@ test('protocol definitions', t => {
     }, /type `b` for function `x` does not match any protocol types/)
   }, 'errors if a typespec is invalid')
   t.done()
+})
+
+test('inheritance', t => {
+  const Quackable = duck.define({
+    talk: []
+  });
+
+  class Quacker{};
+  Quackable.impl(Quacker, {
+    talk: () => '*quack*'
+  });
+
+  class QuackEmitter{}
+  Quackable.impl(QuackEmitter, {
+    talk: function() {
+      this.emit('speech', '*quack*');
+    }
+  });
+
+  let q = new Quacker();
+  let qe = new QuackEmitter();
+
+  t.ok(q.talk() === '*quack*');
+
+  qe.on('speech', word => {
+    t.ok(word === '*quack*');
+    t.done();
+  });
 })
 
 test('derivation', t => {
